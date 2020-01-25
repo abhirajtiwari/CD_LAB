@@ -1,22 +1,37 @@
 #include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
-/*
-	Arithmetic operators - 0
-	Relational operators - 1
-	Logical operators - 2
-	Special symbols - 3
-	Keywords - 4
-	Numerical costants - 5
-	Identifiers - 6  
-*/
+#include <stdlib.h>
+int row = 1;
 int column = 1;
-int row = 0;
-const char *keywords[32] = {
+typedef struct{
+	char * lexeme;
+	int row;
+	int column;
+	char * type;
+}Token;
+Token * newToken(){
+	Token * tok = (Token *) malloc(sizeof(Token)*1);
+	tok->lexeme = "";
+	tok->row = -1;
+	tok->column = -1;
+	tok->type = "";
+	return tok;
+}
+Token * retNulltok(){
+	Token * tok = newToken();
+	tok->lexeme = "EOF";
+	tok->row = -1;
+	tok->column = -1;
+	tok->type = "";
+	return tok;
+}
+const char *keywords[34] = {
 	"auto",
 	"double",
 	"int",
+	"int*",
+	"char*",
 	"struct",
 	"break",
 	"else",
@@ -59,10 +74,9 @@ const char *rops[6]= {
 const char *ss[9]={
 	"=","(",")","[","]","{","}",",",";"
 };
-
 int isKeyword (char *word) {
 	int i;
-	for (i = 0; i < 32; ++i) {
+	for (i = 0; i < 34; ++i) {
 		if (strcmp(word, keywords[i]) == 0) {
 			return 1;
 		}
@@ -139,9 +153,10 @@ char * identify(char *str){
 		return "Identifier";
 	}
 }
-void print_token(char a[],int len){
+Token * print_token(char a[],int len){
 	char b[len];
 	int k = 0;
+	Token * tok = newToken();
 	for(int i = 0;i<len;i++){
 		if(a[i] == ' ' || a[i] == '\t' || a[i] == '\n'){
 			continue;
@@ -155,67 +170,83 @@ void print_token(char a[],int len){
 		str[i] = b[i];
 	}
 	if(strlen(str)>0){
-		printf("<%s,%d,%d,%s>\n",str,row,column,identify(str));
+		tok->lexeme = str;
+		tok->row = row;
+		tok->column = column;
+		tok->type = identify(str);
 		column+=strlen(str);
 	}
-	
+	return tok;
 }
-int main(int argc, char const * argv[])
-{
-	FILE *fa,*fb;
-	fa = fopen("sample.c","r");
-	fb = fopen("sample_out.c","w");
+void print_struct(Token *tok){
+	printf("<%s,%d,%d,%s>\n",tok->lexeme,tok->row,tok->column,tok->type);
+}
+void ignoreComments(FILE *fa){
+	char x;
+	x = getc(fa);
+	if(x == '/'){
+		//Single line comment
+		while(x != '\n'){
+			x = getc(fa);
+		}
+		row++;
+		column = 1;
+	}
+	else if(x == '*'){
+		//Multiline comment 
+		x = getc(fa);
+		while(x != '*'){
+			if(x == '\n'){
+				row++;
+			}
+			x = getc(fa);
+		}
+			row++;
+		x = getc(fa);
+		x = getc(fa);
+		row ++;
+		column = 1;
+	}
+}
+void ignoreStringLiterals(FILE *fa){
+	char x;
+	x = getc(fa);
+	while(x != '"'){
+		x = getc(fa);
+	}
+}
+void ignorePreProcessorDirectives(FILE *fa){
+	char x;
+	x = getc(fa);
+	while(x != '\n'){
+		x = getc(fa);
+	}
+		row++;
+		column = 1;
+}
+Token * getNextToken(FILE * fa,int r,int cl){
+	row = r;
+	column = cl;
 	int counter = 0;
-	int token_start = 0;
 	char c,x;
 	c = getc(fa);
 	char a[80];
+	Token *tok = newToken();
 	while(c!=EOF){
 		if(c == '/'){
-			x = getc(fa);
-			if(x == '/'){
-				//Single line comment
-				while(x != '\n'){
-					x = getc(fa);
-				}
-				row++;
-				column = 1;
-			}
-			else if(x == '*'){
-				//Multiline comment 
-				x = getc(fa);
-				while(x != '*'){
-					if(x == '\n'){
-						row++;
-					}
-					x = getc(fa);
-				}
-					row++;
-				x = getc(fa);
-				x = getc(fa);
-				row ++;
-				column = 1;
-			}
+			ignoreComments(fa);
 		}
 		else if(c == '"'){
-			x = getc(fa);
-			while(x != '"'){
-				x = getc(fa);
-			}
+			ignoreStringLiterals(fa);
 		}
 		else if(c == '#'){
-			x = getc(fa);
-			while(x != '\n'){
-				x = getc(fa);
-			}
-				row++;
-				column = 1;
+			ignorePreProcessorDirectives(fa);
 		}
 		else{
 			if(c == ' '){
-				print_token(a,counter);
-				column = column+1;
+				tok = print_token(a,counter);
 				counter = 0;
+				return tok;
 			}
 			else if(c == '\t'){
 				column+=4;
@@ -233,61 +264,17 @@ int main(int argc, char const * argv[])
 				column = column+1;				
 				counter = 0;
 			}
-			else if (c == '('){
-				print_token(a,counter);
-				counter = 0;
-				a[counter++] = c;
-				print_token(a,counter);
-				counter = 0;
-			}
-			else if (c == ')'){
-				print_token(a,counter);
-				counter = 0;
-				a[counter++] = c;
-				print_token(a,counter);
-				counter = 0;
-			}
-			else if (c == '{'){
-				print_token(a,counter);
-				counter = 0;
-				a[counter++] = c;
-				print_token(a,counter);
-				counter = 0;
-			}
-			else if (c == '}'){
-				print_token(a,counter);
-				counter = 0;
-				a[counter++] = c;
-				print_token(a,counter);
-				counter = 0;
-			}
-			else if (c == ';'){
-				print_token(a,counter);
-				counter = 0;
-				a[counter++] = c;
-				print_token(a,counter);
-				counter = 0;
-			}
-			else if (c == '['){
-				print_token(a,counter);
-				counter = 0;
-				a[counter++] = c;
-				print_token(a,counter);
-				counter = 0;
-			}
-			else if (c == ']'){
-				print_token(a,counter);
-				counter = 0;
-				a[counter++] = c;
-				print_token(a,counter);
-				counter = 0;
-			}
-			else if(c == ','){
-				print_token(a,counter);
-				counter = 0;
-				a[counter++] = c;
-				print_token(a,counter);
-				counter = 0;
+			else if (c == '(' || c == ')' || c == '{' || c == '}' ||c == '[' || c == ']' ||c == ',' || c == ';' ){
+				if(counter > 0){
+					tok = print_token(a,counter);
+					ungetc(c,fa);
+					return tok;
+				}
+				else{
+					a[counter++] = c;
+					tok = print_token(a,counter);
+					return tok;
+				}
 			}
 			else{
 				
@@ -296,5 +283,16 @@ int main(int argc, char const * argv[])
 		}
 		c = getc(fa);
 	}
-	return 0;
+	tok = retNulltok();
 }
+// int main(int argc, char const *argv[])
+// {
+// 	Token *tok = newToken();
+// 	FILE * fa = fopen("sample.c","r");
+// 	tok = getNextToken(fa,row,column);
+// 	while(tok->row != -1){
+// 		print_struct(tok);
+// 		tok = getNextToken(fa,row,column);
+// 	}
+// 	return 0;
+// }

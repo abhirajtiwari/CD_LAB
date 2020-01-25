@@ -233,56 +233,7 @@ int main(int argc, char const * argv[])
 				column = column+1;				
 				counter = 0;
 			}
-			else if (c == '('){
-				print_token(a,counter);
-				counter = 0;
-				a[counter++] = c;
-				print_token(a,counter);
-				counter = 0;
-			}
-			else if (c == ')'){
-				print_token(a,counter);
-				counter = 0;
-				a[counter++] = c;
-				print_token(a,counter);
-				counter = 0;
-			}
-			else if (c == '{'){
-				print_token(a,counter);
-				counter = 0;
-				a[counter++] = c;
-				print_token(a,counter);
-				counter = 0;
-			}
-			else if (c == '}'){
-				print_token(a,counter);
-				counter = 0;
-				a[counter++] = c;
-				print_token(a,counter);
-				counter = 0;
-			}
-			else if (c == ';'){
-				print_token(a,counter);
-				counter = 0;
-				a[counter++] = c;
-				print_token(a,counter);
-				counter = 0;
-			}
-			else if (c == '['){
-				print_token(a,counter);
-				counter = 0;
-				a[counter++] = c;
-				print_token(a,counter);
-				counter = 0;
-			}
-			else if (c == ']'){
-				print_token(a,counter);
-				counter = 0;
-				a[counter++] = c;
-				print_token(a,counter);
-				counter = 0;
-			}
-			else if(c == ','){
+			else if (c == '(' || c == ')' || c == '{' || c == '}' ||c == '[' || c == ']' ||c == ',' || c == ';' ){
 				print_token(a,counter);
 				counter = 0;
 				a[counter++] = c;
