@@ -1,0 +1,12 @@
+class B {
+	s:String <- "Hello";
+	a:Int = 123;
+	g(y:String):Int{
+		y.concat(s)
+	};
+	--Comment
+	--Comment2
+	f(x:String):String{
+		x+1
+	};
+};
