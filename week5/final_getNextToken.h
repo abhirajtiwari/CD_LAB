@@ -98,8 +98,8 @@ const char *lops[3]={
 const char *rops[6]= {
 	">=","<=",">","<","==","!="
 };
-const char *ss[9]={
-	"=","(",")","[","]","{","}",",",";"
+const char *ss[10]={
+	"=","(",")","[","]","{","}",",",";","$"
 };
 const char *ibf[5]={
 	"printf","scanf","memcpy","strlen","sqrt"
@@ -142,7 +142,7 @@ int isrops (char *word) {
 }
 int isss (char *word) {
 	int i;
-	for (i = 0; i < 9; ++i) {
+	for (i = 0; i < 10; ++i) {
 		if (strcmp(word, ss[i]) == 0) {
 			return 1;
 		}
@@ -333,7 +333,7 @@ Token * getNextToken(FILE * fa){
 				}
 
 			}
-			else if (c == '(' || c == ')' || c == '{' || c == '}' ||c == '[' || c == ']' ||c == ',' || c == ';' || c == '*'){
+			else if (c == '(' || c == ')' || c == '{' || c == '}' ||c == '[' || c == ']' ||c == ',' || c == ';' || c == '*' || c == '$'){
 				if(c == '{'){scope_count++;}
 				else if(c == '}'){scope_count--;}
 				if(counter > 0){

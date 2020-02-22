@@ -9,11 +9,7 @@ typedef struct{
 	int row;
 	int column;
 }Token;
-int sizeOf(char *str){
-	if(strcmp(str,"int") == 0) return 4;
-	if(strcmp(str,"void") == 0) return 0;
-	else return 0;
-}
+
 Token * newToken(){
 	Token * new = (Token *)malloc(sizeof(Token));
 	new->lexeme = "";

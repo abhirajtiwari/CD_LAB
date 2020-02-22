@@ -11,28 +11,27 @@ typedef struct{
 	int size;
 	int row;
 	int column;
-	char * stype;
 }Token;
 int sizeOf(char *str){
 	if(strcmp(str,"int") == 0) return 4;
 	if(strcmp(str,"void") == 0) return 0;
 	else return 0;
 }
-const char delimiters[9]={
-	'=','{','}','(',')',';',',','.',':'
+const char delimiters[11]={
+	' ','=','{','}','[',']','(',')',';',',','.'
 };
 const char * aops[1]={
 	"+"
 };
-const char * dtypes[2]={
-	"Int","String"
+const char * dtypes[3]={
+	"int","void","String"
 };
-const char * kwords[1]={
-	"class"
+const char * kwords[4]={
+	"public","static","class","System"
 };
 int isDelimiter(char a){
 
-	for (int i = 0; i < 9; ++i){
+	for (int i = 0; i < 11; ++i){
 		if(a==delimiters[i]){
 			return 1;
 		}
@@ -48,7 +47,7 @@ int isAops(char * a){
 	return 0;
 }
 int isDtype(char * a){
-	for (int i = 0; i < 2; ++i){
+	for (int i = 0; i < 3; ++i){
 		if(strcmp(a,dtypes[i]) == 0){
 			return 1;
 		}
@@ -56,7 +55,7 @@ int isDtype(char * a){
 	return 0;
 }
 int isKword(char  * a){
-	for (int i = 0; i < 1; ++i){
+	for (int i = 0; i < 4; ++i){
 		if(strcmp(a,kwords[i]) == 0){
 			return 1;
 		}
@@ -109,52 +108,45 @@ Token * getNextToken(FILE *fa){
 	char c,f;
 	c = getc(fa);
 	while(c!=EOF){
-		if(c == '-'){
-			f = getc(fa);
-			if(f == '-'){
-				while(f != '\n'){
-					f = getc(fa);
-				}
-			}
-		}
-		else if(c == '"'){
-			f = getc(fa);
-			while(f != '"'){
-				f = getc(fa);
-			}
-		}
-		else if(c == '\n'){
-			tok = makeToken(a);
-			row ++;
-			column = 1;
-				return tok;
-		}
-		else if(c == '\t'){
-			tok = makeToken(a);
-			row+=4;
-				return tok;
-		}
-		else if(c == ' '){
-			tok = makeToken(a);
-			row ++;
-				return tok;
-		}
-		else if(isDelimiter(c)){
-			if(counter > 0){
+		if(c == '{' || c == '}' || c == '(' || c == ')' || c == '[' || c == ']' || c== ';' || c == ',' || c == '.')  {
+			if(counter>0){
 				tok = makeToken(a);
 				ungetc(c,fa);
 				return tok;
 			}
 			else{
+				column++;
 				a[counter++] = c;
 				tok = makeToken(a);
-				row ++;
 				return tok;
 			}
 		}
+		else if(c == '\n' || c ==' '|| c == '\t'){
+			tok = makeToken(a);
+			if(c == '\n'){
+				row +=1;
+				column = 1;
+			}
+			else if(c == ' '){
+				column += 1;
+			}
+			else if(c == '\t'){
+				column += 4;
+			}
+			return tok;
+		}
+		else if(c == '"'){
+			column ++;
+			f = getc(fa);
+			column++;
+			while(f != '"'){
+				f = getc(fa);
+				column++;
+			}
+		}
 		else{
-			row++;
-			a[counter ++ ] = c;
+			a[counter++] = c;
+			column++;
 		}
 		c = getc(fa);
 	}
@@ -163,7 +155,7 @@ Token * getNextToken(FILE *fa){
 }
 // int main(int argc, char const *argv[])
 // {
-// 	FILE * fa = fopen("ass_sample.txt","r");
+// 	FILE * fa = fopen("sample.java","r");
 // 	Token * tok = newToken();
 // 	tok = getNextToken(fa);
 // 	while(tok->row!=-1){
