@@ -1,7 +1,4 @@
 #include "genfunc.h"
-//Declaration -> data-type identifier-list;
-//data-type -> int | char
-//identifier-list-> id
 char * first_prog[] = {"main"};
 char * follow_prog[] = {"$"};
 char * first_dec[] = {"int","char"};
@@ -16,6 +13,8 @@ char * first_stmt = {"id"};
 char * follow_stmt = {";"};
 char * first_assignstmt[] = {"id"};
 char * follow_assignstmt[] = {";"};
+char * first_loop[] ={"do","for","while"};
+char * follow_loop[] = {";","}"};
 void DEC();
 void IDLIST();
 void IDLIST2();
@@ -23,6 +22,7 @@ void IDLIST3();
 void STMTLIST();
 void STMT();
 void ASSIGNSTMT();
+void LOOP();
 void PROG(){
 	la = getNextToken(fa);
 	match(la);
@@ -47,7 +47,6 @@ void PROG(){
 }
 void DEC(){
 	printf("in dec\n");
-	//la = getNextToken(fa);
 	if(isInFirst(first_dec,la,2)){
 		match(la);
 		IDLIST();
@@ -144,17 +143,14 @@ void STMTLIST(){
 
 }
 void STMT(){
-	ASSIGNSTMT();
-	// la = getNextToken(fa);
-	// if(strcmp(la->lexeme,";") == 0){
-	// 	match(la);
-	// }
-	// else{
-	// 	printf("ERROR:Found %s\nExpected\";\"\n",la->lexeme);
-	// }
+	if(isInFirst(first_assignstmt,la,1)){
+		ASSIGNSTMT();
+	}
+	else if(isInFirst(first_loop,la,3)){
+		LOOP();
+	}
 }
 void ASSIGNSTMT(){
-	//la = getNextToken(fa);
 	printf("in ass\n");
 	if(isInFirst(first_assignstmt,la,1)){
 		match(la);
@@ -177,6 +173,9 @@ void ASSIGNSTMT(){
 	else{
 		log_error(la,first_assignstmt,follow_assignstmt,1,1);
 	}
+}
+void LOOP(){
+	
 }
 int main(int argc, char const *argv[])
 {
