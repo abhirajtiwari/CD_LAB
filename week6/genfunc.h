@@ -25,6 +25,17 @@ int isInFollow(char *a[],Token * s,int size){
 	}
 	return 0;
 }
+int check(char *a[],Token * s,int size){
+	for(int i = 0;i<size;i++){
+		if(strcmp(a[i],s->type) == 0){
+			return 1;
+		}
+		else if(strcmp(a[i],s->lexeme) == 0){
+			return 1;
+		}
+	}
+	return 0;
+}
 void match(Token *a){
 	int size = strlen(a->lexeme);
 	for(int i = 0;i<size;i++)
@@ -49,6 +60,7 @@ void log_error(Token *a,char *first[],char *follow[],int s1,int s2){
 	}
 	exit(0);
 }
+void finish();
 void finish(){
 	char pa = la->lexeme[0];
 	la = getNextToken(fa);

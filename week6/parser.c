@@ -13,8 +13,14 @@ char * first_stmt = {"id"};
 char * follow_stmt = {";"};
 char * first_assignstmt[] = {"id"};
 char * follow_assignstmt[] = {";"};
+char * first_expr[] = {"id"};
+char * follow_expr[] = {")",";"};
 char * first_loop[] ={"do","for","while"};
 char * follow_loop[] = {";","}"};
+char * first_decision[] = {"if"};
+char * follow_decision[] = {";","}"};
+char * first_decision2[] = {"else"};
+char * follow_decision2[] = {"id"};
 void DEC();
 void IDLIST();
 void IDLIST2();
@@ -23,6 +29,9 @@ void STMTLIST();
 void STMT();
 void ASSIGNSTMT();
 void LOOP();
+void DECNSTMT();
+void DECN2();
+void EXPN();
 void PROG(){
 	la = getNextToken(fa);
 	match(la);
@@ -140,42 +149,97 @@ void STMTLIST(){
 	else if(strcmp(la->lexeme,"}") == 0){
 			finish();
 	}
-
 }
 void STMT(){
-	if(isInFirst(first_assignstmt,la,1)){
-		ASSIGNSTMT();
-	}
-	else if(isInFirst(first_loop,la,3)){
-		LOOP();
-	}
+	// if(isInFirst(first_assignstmt,la,1)){
+	// 	ASSIGNSTMT();
+	// }
+	// else if(isInFirst(first_loop,la,3)){
+	// 	LOOP();
+	// }
+	// else if(isInFirst(first_decision,la,1)){
+	// 	DECNSTMT();
+	// }
+	LOOP();
 }
 void ASSIGNSTMT(){
-	printf("in ass\n");
 	if(isInFirst(first_assignstmt,la,1)){
 		match(la);
 		la = getNextToken(fa);
 		match(la);
 		la = getNextToken(fa);
-		do{
-			if((strcmp(la->type,"id") == 0) || (strcmp(la->type,"num") == 0) || (strcmp(la->type,"aop") ==0)){
-				match(la);
-				la = getNextToken(fa);
-			}
-		}while((strcmp(la->type,"id") == 0) || (strcmp(la->type,"num") == 0) || (strcmp(la->type,"aop") ==0));
-		if(strcmp(la->lexeme,";") == 0){
-			match(la);
-		}
-		else{
-			printf("ERROR:Found %s\nExpected\";\"\n",la->lexeme);
-		}
+		EXPN();
 	}
 	else{
 		log_error(la,first_assignstmt,follow_assignstmt,1,1);
 	}
 }
 void LOOP(){
-	
+	la = getNextToken(fa);
+	match(la);
+	if(isInFirst(first_loop,la,3)){
+		la = getNextToken(fa);
+		match(la);
+	}
+}
+int isexprterm(Token * la){
+	if(la->row == -1)
+		return 0;
+	if( ( (strcmp(la->type,"id")) == 0 )|| ( (strcmp(la->type,"num")) == 0 )|| ( (strcmp(la->type,"lop")) == 0 )|| ( (strcmp(la->type,"rop")) == 0 )|| ( (strcmp(la->type,"aop")) == 0 ) )
+		return 1;
+	else 
+		return 0;
+}
+void EXPN(){
+	printf("in expn\n");
+	do{
+		match(la);
+		sleep(1);
+		la = getNextToken(fa);
+	}while(isexprterm(la));
+	//la = getNextToken(fa);
+		printf("here\n");
+	if(isInFollow(follow_expr,la,2)){
+		printf("in here\n");
+		match(la);
+		STMTLIST();
+	}
+	else{
+		log_error(la,first_expr,follow_expr,1,2);
+	}
+}
+void DECNSTMT(){
+	printf("in decnstmt\n");
+	match(la);
+	la = getNextToken(fa);
+	match(la);
+	la = getNextToken(fa);
+	EXPN();
+	match(la);
+	la = getNextToken(fa);
+//	match(la);
+	if(la->row == -1){
+		printf("here\n");
+		finish();
+	}
+	STMTLIST();
+	DECN2();
+}
+void DECN2(){
+	printf("in decn2\n");
+	la = getNextToken(fa);
+	if(isInFirst(first_decision2,la,1)){
+		match(la);
+		la = getNextToken(fa);
+		EXPN();
+	}
+	else if(isInFollow(follow_decision2,la,1)){
+		printf("Epsilon route taken\n");
+		STMTLIST();
+	}
+	else{
+		log_error(la,first_decision2,follow_decision2,1,1);
+	}
 }
 int main(int argc, char const *argv[])
 {

@@ -189,10 +189,10 @@ char * identify(char *str){
 		return "aop";
 	}
 	else if(isrops(str)){
-		return "Relational Operator";
+		return "rop";
 	}
 	else if(islops(str)){
-		return "Logical Operator";
+		return "lop";
 	}
 	else if(isss(str)){
 		return "ss";
@@ -302,21 +302,30 @@ Token * getNextToken(FILE * fa){
 		}
 		else{
 			if(c == ' '){
-				tok = print_token(a,counter);
-				counter = 0;
-				print_struct(tok);
-				return tok;
+				column++;
+				if(counter > 0){
+					tok = print_token(a,counter);
+					print_struct(tok);
+					return tok;
+				}
 			}
 			else if(c == '\t'){
 				column+=4;
-				print_token(a,counter);
-				counter = 0;
+				if(counter > 0){
+					tok = print_token(a,counter);
+					print_struct(tok);
+					return tok;
+				}
 			}
 			else if (c == '\n'){
-				print_token(a,counter);
 				row++;
 				column = 1;
 				counter = 0;
+				if(counter > 0){
+					tok = print_token(a,counter);
+					print_struct(tok);
+					return tok;
+				}
 			}
 			else if(c == '<' || c == '>' || c == '+' || c == '-' || c == '*' || c == '/' || c == '%'||c == '='){
 				char f = getc(fa);
