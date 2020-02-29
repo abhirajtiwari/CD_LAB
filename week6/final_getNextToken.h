@@ -182,8 +182,11 @@ int isid(char *word){
 	return 1;
 }
 char * identify(char *str){
+	if(isdtype(str)){
+		return "dtype";
+	}
 	if(isKeyword(str)){
-		return "keyword";
+		return "key";
 	}
 	else if(isaops(str)){
 		return "aop";

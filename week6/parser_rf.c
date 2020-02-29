@@ -15,7 +15,7 @@ void DECN2();
 void EXPN();
 void PROG(){
 	char * first[] = {"main"};
-	char * follow[] = {"}"};
+	char * follow[] = {"$"};
 	int first_size = 1;
 	int follow_size = 1;
 	la = getNextToken(fa); //For int
@@ -32,21 +32,13 @@ void PROG(){
 			DEC();
 		else if(strcmp())
 			STMTLIST();
-		la = getNextToken(fa); //For } at end
-		if(check_follow){
-			match(la);
-			finish();
-		}
-		else{
-			error;
-		}
 	}
 	else{
 		error;
 	}
 }
 void DEC(){
-	char * first[] = {"int","char"};
+	char * first[] = {"int","char","^"};
 	char * follow[] = {"id",";","}"};
 	int first_size = 2;
 	int follow_size = 3;
@@ -137,8 +129,9 @@ void IDLIST3(){
 	}
 }
 void STMTLIST(){
-	match(la);
-	STMT();
-	la = getNextToken(fa);
-	if(                                       )
+	char * first[] = {"id","if","for","while"};
+	char * follow[] = {"}"};
+}
+void STMT(){
+	
 }

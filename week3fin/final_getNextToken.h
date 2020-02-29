@@ -21,18 +21,6 @@ int Hash(Token * tok){
 	hash%=10039;
 	return hash;
 }
-const char * dtypes[7] = {
-	"int","double","short","long","float","char","struct"
-};
-int isdtype (char *word) {
-	int i;
-	for (i = 0; i < 7; ++i) {
-		if (strcmp(word, dtypes[i]) == 0) {
-			return 1;
-		}
-	}
-	return 0;
-}
 int isKeyTok(Token * tok){
 	return ( (isdtype(tok->lexeme) && (strcmp(tok->type,"keyword") == 0) ) ? 1 : 0);
 }
@@ -55,6 +43,9 @@ Token * retNulltok(){
 	tok->type = "";
 	return tok;
 }
+const char * dtypes[7] = {
+	"int","double","short","long","float","char","struct"
+};
 const char *keywords[32] = {
 	"auto",
 	"double",
@@ -104,6 +95,15 @@ const char *ss[9]={
 const char *ibf[5]={
 	"printf","scanf","memcpy","strlen","sqrt"
 };
+int isdtype (char *word) {
+	int i;
+	for (i = 0; i < 7; ++i) {
+		if (strcmp(word, dtypes[i]) == 0) {
+			return 1;
+		}
+	}
+	return 0;
+}
 int isKeyword (char *word) {
 	int i;
 	for (i = 0; i < 32; ++i) {

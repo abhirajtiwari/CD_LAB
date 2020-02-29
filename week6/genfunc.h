@@ -43,14 +43,16 @@ void match(Token *a){
 	puts(matched);
 }
 void log_error(Token *a,char *first[],char *follow[],int s1,int s2){
-	printf("ERROR:\nFound \"%s\"\nExpected:\n",a->lexeme);
+	printf("ERROR:(%d,%d)\nFound \"%s\"\nExpected:\n",row+1,column,a->lexeme);
 	int first_size = s1;
 	int follow_size = s2;
 	int flag = 0;
 	for (int i = 0; i < first_size; ++i){
-		printf("\"%s\"\n",first[i]);
 		if(first[i][0] == '^'){
 			flag = 1;
+		}
+		else{
+			printf("\"%s\"\n",first[i]);
 		}
 	}
 	if(flag == 1){
@@ -60,11 +62,16 @@ void log_error(Token *a,char *first[],char *follow[],int s1,int s2){
 	}
 	exit(0);
 }
+void log_error2(Token *a,char *str){
+	printf("ERROR:(%d,%d)\nFound \"%s\"\nExpected:\"%s\"\n",row+1,column,a->lexeme,str);
+	exit(0);
+
+}
 void finish();
 void finish(){
 	char pa = la->lexeme[0];
 	la = getNextToken(fa);
-	if(pa == '}' || la->lexeme[0] == '}'){
+	if(pa == '$' || la->lexeme[0] == '$'){
 		printf("Success!!\n");
 	}
 	else{
